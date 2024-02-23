@@ -1,53 +1,12 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { tempMovieData, tempWatchedData } from "./dummyData";
 
 const average = (arr) =>
     arr.reduce((acc, cur, i, arr) => acc + cur / arr.length, 0);
 
-function Load() {
-    return <p className="loader">loading</p>;
-}
-
-function ErrorMessage({ message }) {
-    return (
-        <div className="error">
-            <span>❌</span> <p>{message}</p>
-        </div>
-    );
-}
-
-const ApiKey = "d7fee4ed";
-
 export default function App() {
     const [movies, setMovies] = useState(tempMovieData);
     const [watched, setWatched] = useState(tempWatchedData);
-    const [isLoading, setIsLoading] = useState(false);
-    const [error, setError] = useState("");
-    const query = "sdgsdg";
-
-    useEffect(function () {
-        async function fetchMovies() {
-            try {
-                setIsLoading(true);
-                const res = await fetch(
-                    `http://www.omdbapi.com/?apikey=${ApiKey}&s=${query}`
-                );
-                if (!res.ok)
-                    throw new Error("Something went wrong when fetching");
-                const data = await res.json();
-                console.log(data);
-                if (data.Response === "False") throw new Error(data.Error);
-                setMovies(data.Search);
-            } catch (err) {
-                console.error(err.message);
-                setError(err.message);
-            } finally {
-                setIsLoading(false);
-            }
-        }
-
-        fetchMovies();
-    }, []);
     return (
         <div>
             <NavBar>
@@ -56,10 +15,7 @@ export default function App() {
             </NavBar>
             <Main>
                 <Box>
-                    {/* {isLoading ? <Load /> : <MovieList movies={movies} />} */}
-                    {isLoading && <Load />}
-                    {!isLoading && !error && <MovieList movies={movies} />}
-                    {error && <ErrorMessage message={error} />}
+                    <MovieList movies={movies} />
                 </Box>
                 <Box>
                     <WatchedSummary watched={watched} />
