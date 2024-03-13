@@ -10,7 +10,7 @@ import { Search } from "./Search";
 import { NumResults } from "./NumResults";
 import { Box } from "./Box";
 //*********************************************************************************************************
-export const ApiKey = "d7fee4ed";
+export const ApiKey = process.env.REACT_APP_API_KEY;
 export const average = (arr) =>
     arr.reduce((acc, cur, i, arr) => acc + cur / arr.length, 0);
 
@@ -43,11 +43,11 @@ export default function App() {
     function handleCloseMovie() {
         setSelectedId(null);
     }
-
+    // deletes selected movie from watched list
     function handleDeleteWatched(id) {
         setWatched((watched) => watched.filter((movie) => movie.imdbID !== id));
     }
-
+    // sets the whatched list
     function handleAddWatched(movie) {
         setWatched((watched) => [...watched, movie]);
     }
@@ -85,6 +85,7 @@ export default function App() {
         },
         [query]
     );
+    //*********************************************************************************************************˚
     return (
         <div>
             <NavBar>
