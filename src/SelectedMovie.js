@@ -13,7 +13,7 @@ export function SelectedMovie({
     const [isLoading, setIsLoading] = useState(false);
     const [userRating, setUserRating] = useState("");
     const isWatched = watched.map((movie) => movie.imdbID).includes(selectedId);
-    console.log(isWatched);
+
     const {
         Title: title,
         Year: year,
@@ -56,6 +56,14 @@ export function SelectedMovie({
         },
         [selectedId]
     );
+
+    useEffect(() => {
+        if (!title) return;
+        document.title = `Movie | ${title}`;
+        return () => {
+            document.title = "usePopcorn";
+        };
+    }, [title]);
     return (
         <>
             <div className="details">
