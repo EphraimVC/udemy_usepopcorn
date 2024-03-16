@@ -35,6 +35,7 @@ export default function App() {
     const [error, setError] = useState("");
     const [query, setQuery] = useState("");
     const [selectedId, setSelectedId] = useState(null);
+    const controller = new AbortController();
 
     function handleSelectedId(id) {
         setSelectedId((selectedId) => (id === selectedId ? null : id));
@@ -59,7 +60,8 @@ export default function App() {
                     setIsLoading(true);
                     setError("");
                     const res = await fetch(
-                        `http://www.omdbapi.com/?apikey=${ApiKey}&s=${query}`
+                        `http://www.omdbapi.com/?apikey=${ApiKey}&s=${query}`,
+                        { signal: controller.signal }
                     );
                     if (!res.ok)
                         throw new Error("Something went wrong when fetching");
@@ -69,7 +71,7 @@ export default function App() {
                     setMovies(data.Search);
                 } catch (err) {
                     console.error(err.message);
-                    setError(err.message);
+                    if (err.name !== "AbortError") setError(err.message);
                 } finally {
                     setIsLoading(false);
                 }
@@ -80,7 +82,11 @@ export default function App() {
                 return;
             }
 
+            handleCloseMovie(); // stops displaying the selectedmovie component when new search is started
             fetchMovies();
+            return function () {
+                controller.abort();
+            };
         },
         [query]
     );

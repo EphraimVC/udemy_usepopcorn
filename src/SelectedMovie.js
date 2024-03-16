@@ -40,6 +40,18 @@ export function SelectedMovie({
         onAddWatched(newWatchedMovie);
         closeSelected();
     }
+
+    useEffect(() => {
+        function callBack(e) {
+            if (e.code === "Escape") closeSelected();
+            console.log("Closing");
+        }
+        document.addEventListener("keydown", callBack);
+        return function () {
+            document.removeEventListener("keydown", callBack);
+        };
+    }, [closeSelected]);
+
     useEffect(
         function () {
             async function getMovieDetails() {
