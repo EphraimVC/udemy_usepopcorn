@@ -7,7 +7,8 @@ the application get data from an API called OMDB API so the user can search for 
 
 ## Environment Variables
 
--   `REACT_APP_API_KEY`: OMDB API key (accessed in `App.js`)
+-   `REACT_APP_API_KEY`= OMDB API key (accessed in `App.js`)
+-   `OMDB api link`: https://www.omdbapi.com/
 
 ---
 

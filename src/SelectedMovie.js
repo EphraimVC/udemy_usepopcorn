@@ -12,6 +12,7 @@ export function SelectedMovie({
     const [movie, setMovie] = useState({});
     const [isLoading, setIsLoading] = useState(false);
     const [userRating, setUserRating] = useState("");
+    // check if an movie with a certain ID alredy exists in the watched array
     const isWatched = watched.map((movie) => movie.imdbID).includes(selectedId);
 
     const {
@@ -55,14 +56,31 @@ export function SelectedMovie({
     useEffect(
         function () {
             async function getMovieDetails() {
-                setIsLoading(true);
-                const res = await fetch(
-                    `http://www.omdbapi.com/?apikey=${ApiKey}&i=${selectedId}`
-                );
-                const data = await res.json();
-                setMovie(data);
-                setIsLoading(false);
-                console.log(data);
+                try {
+                    setIsLoading(true);
+                    const res = await fetch(
+                        `https://www.omdbapi.com/?apikey=${ApiKey}&i=${selectedId}`
+                    );
+
+                    if (!res.ok) {
+                        throw new Error(
+                            "Something went wrong when fetching movie details"
+                        );
+                    }
+
+                    const data = await res.json();
+
+                    if (data.Response === "False") {
+                        throw new Error(data.Error);
+                    }
+
+                    setMovie(data);
+                    console.log(data);
+                } catch (err) {
+                    console.error(err.message);
+                } finally {
+                    setIsLoading(false);
+                }
             }
             getMovieDetails();
         },

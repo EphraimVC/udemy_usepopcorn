@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { tempMovieData, tempWatchedData } from "./dummyData";
+// import { tempMovieData } from "./dummyData";
 import { MovieList } from "./MovieList";
 import { SelectedMovie } from "./SelectedMovie";
 import { WatchedSummary } from "./WatchedSummary";
@@ -29,13 +29,12 @@ function ErrorMessage({ message }) {
 //*********************************************************************************************************
 
 export default function App() {
-    const [movies, setMovies] = useState(tempMovieData);
+    const [movies, setMovies] = useState([]);
     const [watched, setWatched] = useState([]);
     const [isLoading, setIsLoading] = useState(false);
     const [error, setError] = useState("");
     const [query, setQuery] = useState("");
     const [selectedId, setSelectedId] = useState(null);
-    const controller = new AbortController();
 
     function handleSelectedId(id) {
         setSelectedId((selectedId) => (id === selectedId ? null : id));
@@ -55,12 +54,28 @@ export default function App() {
 
     useEffect(
         function () {
+            if (query.length < 3) {
+                setMovies([]);
+                setError("");
+                handleCloseMovie();
+                return;
+            }
+
+            const controller = new AbortController();
+
             async function fetchMovies() {
                 try {
                     setIsLoading(true);
                     setError("");
+
+                    if (!ApiKey) {
+                        throw new Error(
+                            "API key is not configured. Please set REACT_APP_API_KEY in your .env file."
+                        );
+                    }
+
                     const res = await fetch(
-                        `http://www.omdbapi.com/?apikey=${ApiKey}&s=${query}`,
+                        `https://www.omdbapi.com/?apikey=${ApiKey}&s=${query}`,
                         { signal: controller.signal }
                     );
                     if (!res.ok)
@@ -76,15 +91,11 @@ export default function App() {
                     setIsLoading(false);
                 }
             }
-            if (query.length < 3) {
-                setMovies([]);
-                setError("");
-                return;
-            }
 
             handleCloseMovie(); // stops displaying the selectedmovie component when new search is started
             fetchMovies();
             return function () {
+                //in this case this abort controller, cancels any fetch when there is a new keystroke on the input field
                 controller.abort();
             };
         },
@@ -104,7 +115,10 @@ export default function App() {
                     {/* {isLoading ? <Load /> : <MovieList movies={movies} />} */}
                     {isLoading && <Load />}
                     {!isLoading && !error && (
-                        <MovieList movies={movies} selectedId={setSelectedId} />
+                        <MovieList
+                            movies={movies}
+                            selectedId={handleSelectedId}
+                        />
                     )}
                     {error && <ErrorMessage message={error} />}
                 </Box>
